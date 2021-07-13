@@ -7,16 +7,27 @@ class RedisPool
 {
     const N = 5;
 
-    protected \SplQueue $pool;
+    protected ?\SplQueue $pool = null;
 
-    static public function createClient(): Redis
+    protected static ?self $instance = null;
+
+    public static function getPool(): self
+    {
+        if(!self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    protected static function createClient(): Redis
     {
         $redis = new Redis();
         $redis->connect('127.0.0.1', 6379);
         return $redis;
     }
 
-    public function __construct()
+    protected function __construct()
     {
         $this->pool = new \SplQueue();
 

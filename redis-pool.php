@@ -8,15 +8,9 @@ use Swoole\Http\Server;
 
 $pool = null;
 $server = new Server('127.0.0.1', 9501);
-$server->on('workerStart', function (Server $server) use (&$pool) {
-    $pool = new RedisPool();
-});
 
-$server->on('workerExit', function (Server $server) use (&$pool) {
-    unset($pool);
-});
-
-$server->on('request', function (Request $req, Response $resp) use (&$pool) {
+$server->on('request', function (Request $req, Response $resp) {
+    $pool = RedisPool::getPool();
     $redis = $pool->get();
     if ($redis === false) {
         $resp->end("ERROR");
